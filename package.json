@@ -1,0 +1,22 @@
+{
+  "name": "appquadrafaminas",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000A\u0000p\u0000p\u0000-\u0000Q\u0000u\u0000a\u0000d\u0000r\u0000a\u0000s\u0000-\u0000B\u0000a\u0000c\u0000k\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "knex": "^3.1.0"
+  }
+}
