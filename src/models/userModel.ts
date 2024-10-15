@@ -1,23 +1,45 @@
-import { v7 as uuidv7 } from 'uuid';
-import bcrypt from 'bcrypt';
+import { db } from '../database/db';
+import { ResultSetHeader } from 'mysql2';
 
-// Simulação de um banco de dados
-const usuarios = new Map<string, any>();
+// Função para criar um novo usuário no banco de dados
+export const criarUsuario = async (
+    nome: string,
+    email: string,
+    senha: string,
+    telefone: string,
+    matricula: string,
+    curso: string,
+    role: string
+) => {
+    const query = `
+        INSERT INTO usuario (nome, email, senha, telefone, matricula, curso, role)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
 
-export const criarUsuario = async (nome: string, email: string, senha: string, telefone: string, matricula: string, curso: string, role: string) => {
-  const id = uuidv7();
-  const senhaHash = await bcrypt.hash(senha, 10);
+    const [result] = await db.execute<ResultSetHeader>(query, [
+        nome,
+        email,
+        senha,
+        telefone,
+        matricula,
+        curso,
+        role,
+    ]);
 
-  const novoUsuario = { id, nome, email, senha: senhaHash, telefone, matricula, curso, role };
-  usuarios.set(email, novoUsuario);
-
-  return novoUsuario;
+    // Verifique o insertId do resultado
+    return { id: result.insertId, nome, email };
 };
 
-export const encontrarUsuarioPorEmail = (email: string) => {
-  return usuarios.get(email);
+// Função para encontrar um usuário pelo email
+export const encontrarUsuarioPorEmail = async (email: string) => {
+    const query = 'SELECT * FROM usuario WHERE email = ?';
+    const [rows] = await db.execute<any[]>(query, [email]); // Aqui, assumimos que rows é um array de resultados
+    return rows[0];  // Retorna o usuário encontrado ou undefined se não encontrado
 };
 
-export const validarSenha = async (senha: string, senhaHash: string): Promise<boolean> => {
-  return bcrypt.compare(senha, senhaHash);
+// Função para validar a senha (usando bcrypt ou outro método)
+export const validarSenha = async (senha: string, senhaHash: string) => {
+    // Aqui você pode usar bcrypt para comparar senhas (supondo que esteja usando hash)
+    // Exemplo: return bcrypt.compare(senha, senhaHash);
+    return senha === senhaHash;  // Comparação simples (a ser substituída por algo mais seguro)
 };

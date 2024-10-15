@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
         const novoUsuario = await criarUsuario(nome, email, senha, telefone, matricula, curso, role);
 
-        const token = gerarToken(novoUsuario.id, novoUsuario.nome, novoUsuario.email);
+        const token = gerarToken(novoUsuario.id.toString(), novoUsuario.nome, novoUsuario.email);
 
         res.status(201).json({ token, usuario: { id: novoUsuario.id, nome: novoUsuario.nome, email: novoUsuario.email } });
     } catch (error) {
@@ -38,8 +38,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const token = gerarToken(usuario.id, usuario.nome, usuario.email);
-
+        const token = gerarToken(usuario.id.toString(), usuario.nome, usuario.email);
         res.status(200).json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email } });
     } catch (error) {
         res.status(500).json({ mensagem: 'Erro no servidor', error });
