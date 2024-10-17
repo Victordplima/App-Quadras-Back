@@ -13,7 +13,7 @@ export const criarUsuarioDB = async (
     const query = `
         INSERT INTO usuario (nome, email, senha, telefone, matricula, curso, role)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING id, nome, email;  -- Retorna id, nome e email do novo usuário
+        RETURNING id, nome, email;
     `;
     const values = [nome, email, senha, telefone, matricula, curso, role];
     const result: QueryResult = await pool.query(query, values);
@@ -43,12 +43,12 @@ export const editarUsuarioDB = async (
         UPDATE usuario
         SET nome = $1, email = $2, telefone = $3, matricula = $4, curso = $5, role = $6
         WHERE id = $7
-        RETURNING id;  -- Retorna o id do usuário atualizado
+        RETURNING id;
     `;
     const values = [nome, email, telefone, matricula, curso, role, id];
     const result: QueryResult = await pool.query(query, values);
 
-    if (result.rowCount !== null && result.rowCount > 0) {
+    if (result?.rowCount && result.rowCount > 0) {
         return true;
     }
     return false;
@@ -60,7 +60,7 @@ export const deletarUsuarioDB = async (id: string) => {
     const query = 'DELETE FROM usuario WHERE id = $1 RETURNING id';
     const result: QueryResult = await pool.query(query, [id]);
 
-    if (result.rowCount !== null && result.rowCount > 0) {
+    if (result?.rowCount && result.rowCount > 0) {
         return true;
     }
     return false;

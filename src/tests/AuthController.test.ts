@@ -53,15 +53,7 @@ describe('AuthController', () => {
 
         const response = await request(app)
             .post('/register')
-            .send({
-                nome: mockUsuario.nome,
-                email: mockUsuario.email,
-                senha: mockUsuario.senha,
-                telefone: mockUsuario.telefone,
-                matricula: mockUsuario.matricula,
-                curso: mockUsuario.curso,
-                role: mockUsuario.role,
-            });
+            .send(mockUsuario);
 
         expect(response.status).toBe(201);  // Status correto
         expect(response.body).toHaveProperty('token', 'token-falso');  // Token correto
@@ -74,9 +66,6 @@ describe('AuthController', () => {
         expect(typeof response.body.usuario.id).toBe('string');
         expect(response.body.usuario.id).toHaveLength(36);  // Comprimento típico de UUID
     });
-
-
-
 
     it('deve falhar se o email já estiver registrado', async () => {
         const mockUsuario = {
@@ -94,22 +83,11 @@ describe('AuthController', () => {
 
         const response = await request(app)
             .post('/register')
-            .send({
-                nome: mockUsuario.nome,
-                email: mockUsuario.email,
-                senha: mockUsuario.senha,
-                telefone: mockUsuario.telefone,  // Adicionando campos faltantes
-                matricula: mockUsuario.matricula,
-                curso: mockUsuario.curso,
-                role: mockUsuario.role,
-            });
+            .send(mockUsuario);
 
         expect(response.status).toBe(400);
         expect(response.body.mensagem).toBe('Usuário já registrado com este email');
     });
-
-
-
 
     it('deve realizar login com sucesso', async () => {
         const mockUsuario = {
@@ -133,15 +111,11 @@ describe('AuthController', () => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('token', 'token-falso');
         expect(response.body.usuario).toEqual({
-            id: mockUsuario.id,  // Agora o id está consistente com o mock
+            id: mockUsuario.id,
             nome: mockUsuario.nome,
             email: mockUsuario.email,
         });
     });
-
-
-
-
 
     it('deve falhar no login se a senha estiver incorreta', async () => {
         const mockUsuario = {
@@ -152,7 +126,7 @@ describe('AuthController', () => {
         };
 
         encontrarUsuarioPorEmail.mockResolvedValue(mockUsuario);
-        validarSenha.mockResolvedValue(false);
+        validarSenha.mockResolvedValue(false);  // Simulando senha incorreta
 
         const response = await request(app)
             .post('/login')
@@ -165,9 +139,8 @@ describe('AuthController', () => {
         expect(response.body.mensagem).toBe('Senha incorreta');
     });
 
-
-
     it('deve falhar no login se o email não estiver registrado', async () => {
+        // Simulando que o email não está registrado
         encontrarUsuarioPorEmail.mockResolvedValue(null);
 
         const response = await request(app)
