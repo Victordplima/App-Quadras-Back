@@ -1,13 +1,14 @@
-import mysql from 'mysql2';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'quadras_db',
-  waitForConnections: true,
-  connectionLimit: 10,  // Número máximo de conexões simultâneas
-  queueLimit: 0,  // Sem limite de fila
+dotenv.config();
+
+const pool = new Pool({
+    user: process.env.DB_USER,       // Usuario
+    host: process.env.DB_HOST,       // Host
+    database: process.env.DB_NAME,   // Nome do banco
+    password: process.env.DB_PASSWORD, // Senha
+    port: parseInt(process.env.DB_PORT || '5432', 10), // Porta
 });
 
-export const db = pool.promise();
+export default pool;

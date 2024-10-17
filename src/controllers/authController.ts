@@ -1,46 +1,106 @@
 import { Request, Response } from 'express';
-import { criarUsuario, encontrarUsuarioPorEmail, validarSenha } from '../models/userModel';
-import { gerarToken } from '../utils/tokenUtils';
+import { registrarUsuario, logarUsuario, editarUsuario, deletarUsuario, buscarUsuarioPorId, listarUsuarios } from '../business/userBusiness';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const { nome, email, senha, telefone, matricula, curso, role } = req.body;
 
-        const usuarioExistente = await encontrarUsuarioPorEmail(email);
-        if (usuarioExistente) {
-            res.status(400).json({ mensagem: 'Usuário já registrado com este email' });
+        // Verificar se os campos obrigatórios estão presentes
+        if (!nome || !email || !senha || !telefone || !matricula || !curso || !role) {
+            res.status(400).json({ mensagem: 'Campos obrigatórios ausentes' });
             return;
         }
 
-        const novoUsuario = await criarUsuario(nome, email, senha, telefone, matricula, curso, role);
-
-        const token = gerarToken(novoUsuario.id.toString(), novoUsuario.nome, novoUsuario.email);
-
-        res.status(201).json({ token, usuario: { id: novoUsuario.id, nome: novoUsuario.nome, email: novoUsuario.email } });
-    } catch (error) {
-        res.status(500).json({ mensagem: 'Erro no servidor', error });
+        const resultado = await registrarUsuario(nome, email, senha, telefone, matricula, curso, role);
+        res.status(201).json(resultado);
+    } catch (error: any) {
+        res.status(400).json({ mensagem: error.message });
     }
 };
+
+
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, senha } = req.body;
 
-        const usuario = await encontrarUsuarioPorEmail(email);
-        if (!usuario) {
-            res.status(400).json({ mensagem: 'Credenciais inválidas' });
+        if (!email || !senha) {
+            res.status(400).json({ mensagem: 'Campos obrigatórios ausentes' });
             return;
         }
 
-        const senhaCorreta = await validarSenha(senha, usuario.senha);
-        if (!senhaCorreta) {
-            res.status(400).json({ mensagem: 'Credenciais inválidas' });
+        const resultado = await logarUsuario(email, senha);
+        res.status(200).json(resultado);
+    } catch (error: any) {
+        res.status(400).json({ mensagem: error.message });
+    }
+};
+
+
+
+export const editar = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { nome, email, telefone, matricula, curso, role } = req.body;
+
+        const idNumber = Number(id);
+        if (isNaN(idNumber)) {
+            res.status(400).json({ mensagem: 'ID inválido' });
             return;
         }
 
-        const token = gerarToken(usuario.id.toString(), usuario.nome, usuario.email);
-        res.status(200).json({ token, usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email } });
-    } catch (error) {
-        res.status(500).json({ mensagem: 'Erro no servidor', error });
+        const resultado = await editarUsuario(idNumber, nome, email, telefone, matricula, curso, role);
+        res.status(200).json(resultado);
+    } catch (error: any) {
+        res.status(400).json({ mensagem: error.message });
+    }
+};
+
+
+
+export const deletar = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const idNumber = Number(id);
+        if (isNaN(idNumber)) {
+            res.status(400).json({ mensagem: 'ID inválido' });
+            return;
+        }
+
+        const resultado = await deletarUsuario(idNumber);
+        res.status(200).json(resultado);
+    } catch (error: any) {
+        res.status(400).json({ mensagem: error.message });
+    }
+};
+
+
+
+export const buscarPorId = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+
+        const idNumber = Number(id);
+        if (isNaN(idNumber)) {
+            res.status(400).json({ mensagem: 'ID inválido' });
+            return;
+        }
+
+        const usuario = await buscarUsuarioPorId(idNumber);
+        res.status(200).json(usuario);
+    } catch (error: any) {
+        res.status(404).json({ mensagem: error.message });
+    }
+};
+
+
+
+export const listar = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const usuarios = await listarUsuarios();
+        res.status(200).json(usuarios);
+    } catch (error: any) {
+        res.status(400).json({ mensagem: error.message });
     }
 };
