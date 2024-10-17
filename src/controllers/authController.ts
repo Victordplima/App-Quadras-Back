@@ -5,7 +5,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     try {
         const { nome, email, senha, telefone, matricula, curso, role } = req.body;
 
-        // Verificar se os campos obrigatórios estão presentes
         if (!nome || !email || !senha || !telefone || !matricula || !curso || !role) {
             res.status(400).json({ mensagem: 'Campos obrigatórios ausentes' });
             return;
@@ -14,10 +13,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         const resultado = await registrarUsuario(nome, email, senha, telefone, matricula, curso, role);
         res.status(201).json(resultado);
     } catch (error: any) {
-        // Lidar com erros específicos, como usuário já registrado
+        console.error("Erro durante o registro do usuário:", error);
         res.status(400).json({ mensagem: error.message });
     }
 };
+
+
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {

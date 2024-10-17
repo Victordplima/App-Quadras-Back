@@ -41,8 +41,9 @@ describe('AuthController', () => {
         // Simulando que o usuário ainda não existe
         encontrarUsuarioPorEmail.mockResolvedValue(null);
 
-        // Simulando a criação de usuário com sucesso
+        // Simulando a criação de usuário com UUID
         criarUsuario.mockResolvedValue({
+            id: 'df4b3261-f157-4358-8eb8-a9f89a057a1b',  // UUID simulado
             nome: mockUsuario.nome,
             email: mockUsuario.email,
         });
@@ -62,13 +63,18 @@ describe('AuthController', () => {
                 role: mockUsuario.role,
             });
 
-        expect(response.status).toBe(201);
-        expect(response.body).toHaveProperty('token', 'token-falso');
+        expect(response.status).toBe(201);  // Status correto
+        expect(response.body).toHaveProperty('token', 'token-falso');  // Token correto
         expect(response.body.usuario).toEqual({
             nome: mockUsuario.nome,
             email: mockUsuario.email,
         });
+
+        // Verificando que o id é do tipo string (para simular UUID)
+        expect(typeof response.body.usuario.id).toBe('string');
+        expect(response.body.usuario.id).toHaveLength(36);  // Comprimento típico de UUID
     });
+
 
 
 
@@ -107,7 +113,7 @@ describe('AuthController', () => {
 
     it('deve realizar login com sucesso', async () => {
         const mockUsuario = {
-            id: 'uuid-gerado-no-banco',
+            id: '5bfc7027-3756-42ea-855b-e4a481fac506',  // ID ajustado para simular o banco
             nome: 'João Silva',
             email: 'joao.silva@email.com',
             senha: 'senha123',
@@ -127,11 +133,13 @@ describe('AuthController', () => {
         expect(response.status).toBe(200);
         expect(response.body).toHaveProperty('token', 'token-falso');
         expect(response.body.usuario).toEqual({
-            id: mockUsuario.id,
+            id: mockUsuario.id,  // Agora o id está consistente com o mock
             nome: mockUsuario.nome,
             email: mockUsuario.email,
         });
     });
+
+
 
 
 
