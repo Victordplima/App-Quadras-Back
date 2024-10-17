@@ -14,11 +14,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         const resultado = await registrarUsuario(nome, email, senha, telefone, matricula, curso, role);
         res.status(201).json(resultado);
     } catch (error: any) {
+        // Lidar com erros específicos, como usuário já registrado
         res.status(400).json({ mensagem: error.message });
     }
 };
-
-
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -35,8 +34,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         res.status(400).json({ mensagem: error.message });
     }
 };
-
-
 
 export const editar = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -56,8 +53,6 @@ export const editar = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-
-
 export const deletar = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -75,8 +70,6 @@ export const deletar = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-
-
 export const buscarPorId = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -93,8 +86,6 @@ export const buscarPorId = async (req: Request, res: Response): Promise<void> =>
         res.status(404).json({ mensagem: error.message });
     }
 };
-
-
 
 export const listar = async (req: Request, res: Response): Promise<void> => {
     try {

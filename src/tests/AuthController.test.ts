@@ -16,6 +16,7 @@ jest.mock('../utils/tokenUtils', () => ({
 const { criarUsuario, encontrarUsuarioPorEmail, validarSenha } = require('../models/userModel');
 const { gerarToken } = require('../utils/tokenUtils');
 
+// Configuração do app Express
 const app = express();
 app.use(express.json());
 app.post('/register', register);
@@ -28,20 +29,25 @@ describe('AuthController', () => {
 
     it('deve registrar um usuário com sucesso', async () => {
         const mockUsuario = {
-            id: 1,
             nome: 'João Silva',
-            email: 'joao@example.com',
-            senha: '123456',
+            email: 'joao.silva@emaila.com',
+            senha: 'senha123',
             telefone: '123456789',
-            matricula: '2022001',
+            matricula: '1-23-11556',
             curso: 'Engenharia',
             role: 'aluno',
         };
 
-        criarUsuario.mockResolvedValue({ id: mockUsuario.id, nome: mockUsuario.nome, email: mockUsuario.email });
+        // Simulando que o usuário ainda não existe
+        encontrarUsuarioPorEmail.mockResolvedValue(null);
 
-        encontrarUsuarioPorEmail.mockResolvedValue(null); // Simular que o usuário não existe
+        // Simulando a criação de usuário com sucesso
+        criarUsuario.mockResolvedValue({
+            nome: mockUsuario.nome,
+            email: mockUsuario.email,
+        });
 
+        // Simulando a geração do token
         gerarToken.mockReturnValue('token-falso');
 
         const response = await request(app)
@@ -59,21 +65,26 @@ describe('AuthController', () => {
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('token', 'token-falso');
         expect(response.body.usuario).toEqual({
-            id: mockUsuario.id,
             nome: mockUsuario.nome,
             email: mockUsuario.email,
         });
     });
 
+
+
     it('deve falhar se o email já estiver registrado', async () => {
         const mockUsuario = {
-            id: 1,
             nome: 'João Silva',
-            email: 'joao@example.com',
-            senha: '123456',
+            email: 'joao.silva@emaila.com',
+            senha: 'senha123',
+            telefone: '123456789',
+            matricula: '1-23-11556',
+            curso: 'Engenharia',
+            role: 'aluno',
         };
 
-        encontrarUsuarioPorEmail.mockResolvedValue(mockUsuario); // Simular que o usuário já existe
+        // Simulando que o usuário já existe
+        encontrarUsuarioPorEmail.mockResolvedValue(mockUsuario);
 
         const response = await request(app)
             .post('/register')
@@ -81,22 +92,29 @@ describe('AuthController', () => {
                 nome: mockUsuario.nome,
                 email: mockUsuario.email,
                 senha: mockUsuario.senha,
+                telefone: mockUsuario.telefone,  // Adicionando campos faltantes
+                matricula: mockUsuario.matricula,
+                curso: mockUsuario.curso,
+                role: mockUsuario.role,
             });
 
         expect(response.status).toBe(400);
         expect(response.body.mensagem).toBe('Usuário já registrado com este email');
     });
 
+
+
+
     it('deve realizar login com sucesso', async () => {
         const mockUsuario = {
-            id: 1,
+            id: 'uuid-gerado-no-banco',
             nome: 'João Silva',
-            email: 'joao@example.com',
-            senha: '123456',
+            email: 'joao.silva@email.com',
+            senha: 'senha123',
         };
 
         encontrarUsuarioPorEmail.mockResolvedValue(mockUsuario);
-        validarSenha.mockResolvedValue(true); // Simular senha válida
+        validarSenha.mockResolvedValue(true);
         gerarToken.mockReturnValue('token-falso');
 
         const response = await request(app)
@@ -115,16 +133,18 @@ describe('AuthController', () => {
         });
     });
 
+
+
     it('deve falhar no login se a senha estiver incorreta', async () => {
         const mockUsuario = {
-            id: 1,
+            id: 'uuid-gerado-no-banco',
             nome: 'João Silva',
-            email: 'joao@example.com',
-            senha: '123456',
+            email: 'joao.silva@email.com',
+            senha: 'senha123',
         };
 
         encontrarUsuarioPorEmail.mockResolvedValue(mockUsuario);
-        validarSenha.mockResolvedValue(false); // Simular senha incorreta
+        validarSenha.mockResolvedValue(false);
 
         const response = await request(app)
             .post('/login')
@@ -137,13 +157,15 @@ describe('AuthController', () => {
         expect(response.body.mensagem).toBe('Senha incorreta');
     });
 
+
+
     it('deve falhar no login se o email não estiver registrado', async () => {
-        encontrarUsuarioPorEmail.mockResolvedValue(null); // Simular usuário não encontrado
+        encontrarUsuarioPorEmail.mockResolvedValue(null);
 
         const response = await request(app)
             .post('/login')
             .send({
-                email: 'emailInexistente@example.com',
+                email: 'emailInexistente@email.com',
                 senha: 'qualquerSenha',
             });
 
