@@ -69,7 +69,7 @@ export const deletarUsuarioDB = async (id: string) => {
 
 
 export const encontrarUsuarioPorIdDB = async (id: string) => {
-    const query = 'SELECT * FROM usuario WHERE id = $1';
+    const query = 'SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario WHERE id = $1';
     const result: QueryResult = await pool.query(query, [id]);
     return result.rows[0];
 };
@@ -77,7 +77,8 @@ export const encontrarUsuarioPorIdDB = async (id: string) => {
 
 
 export const listarUsuariosDB = async () => {
-    const query = 'SELECT * FROM usuario';
+    const query = 'SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario';
     const result: QueryResult = await pool.query(query);
     return result.rows;
 };
+
