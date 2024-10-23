@@ -1,14 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { UsuarioModelo } from '../models/userModel'
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { UsuarioModelo } from "../models/userModel";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'quadrasmaneiras123';
+const JWT_SECRET = process.env.JWT_SECRET || "quadrasmaneiras123";
 
-export const protegerRota = (req: Request, res: Response, next: NextFunction): void => {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+export const protegerRota = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): void => {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
-        res.status(401).json({ mensagem: 'Acesso negado, token não fornecido' });
+        res.status(401).json({
+            mensagem: "Acesso negado, token não fornecido",
+        });
         return;
     }
 
@@ -17,6 +23,6 @@ export const protegerRota = (req: Request, res: Response, next: NextFunction): v
         req.usuario = decoded;
         next();
     } catch (err) {
-        res.status(401).json({ mensagem: 'Token inválido' });
+        res.status(401).json({ mensagem: "Token inválido" });
     }
 };
