@@ -33,18 +33,16 @@ export const criarReserva = async (reserva: any) => {
 
 
 
-export const buscarReservasDaSemana = async (page: number = 1) => {
+export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string) => {
     const dataAtual = new Date();
 
-    // calcula o início da semana da página especificada
-    const diaAtual = dataAtual.getDate() - dataAtual.getDay(); // inicio da semana atual
+    // Calcula o início da semana da página especificada
+    const diaAtual = dataAtual.getDate() - dataAtual.getDay(); // início da semana atual
     const diasAdicionais = (page - 1) * 7; // deslocamento de semanas para a página solicitada
 
-    // define a data de início e fim da semana
-    const dataInicioSemana = new Date(
-        dataAtual.setDate(diaAtual + diasAdicionais)
-    );
-    dataInicioSemana.setHours(0, 0, 0, 0); // inicio da semana
+    // Define a data de início e fim da semana
+    const dataInicioSemana = new Date(dataAtual.setDate(diaAtual + diasAdicionais));
+    dataInicioSemana.setHours(0, 0, 0, 0); // início da semana
 
     const dataFimSemana = new Date(dataInicioSemana);
     dataFimSemana.setDate(dataInicioSemana.getDate() + 6); // fim da semana
@@ -53,13 +51,19 @@ export const buscarReservasDaSemana = async (page: number = 1) => {
     const dataInicioISO = dataInicioSemana.toISOString().split("T")[0];
     const dataFimISO = dataFimSemana.toISOString().split("T")[0];
 
-    const resultado = await pool.query(
-        `SELECT * FROM Reserva WHERE Data BETWEEN $1 AND $2`,
-        [dataInicioISO, dataFimISO]
-    );
+    // se um quadraId for fornecido, incluir na query
+    let query = `SELECT * FROM Reserva WHERE Data BETWEEN $1 AND $2`;
+    const params: any[] = [dataInicioISO, dataFimISO];
 
+    if (quadraId) {
+        query += ` AND Quadra_ID = $3`;
+        params.push(quadraId);
+    }
+
+    const resultado = await pool.query(query, params);
     return resultado.rows;
 };
+
 
 
 

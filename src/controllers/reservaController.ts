@@ -27,10 +27,10 @@ export const criarReserva = async (req: Request, res: Response) => {
 
 
 export const buscarReservasDaSemana = async (req: Request, res: Response) => {
-    const { page = 1 } = req.query;
+    const { page = 1, quadraId } = req.query;
 
     try {
-        const reservas = await reservaData.buscarReservasDaSemana(Number(page));
+        const reservas = await reservaData.buscarReservasDaSemana(Number(page), quadraId as string);
         res.status(200).json(reservas);
     } catch (error) {
         res.status(500).json({ error: "Erro ao buscar reservas da semana." });
