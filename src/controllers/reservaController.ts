@@ -54,10 +54,10 @@ export const buscarReservasPorUsuario = async (req: Request, res: Response) => {
 
 export const alterarStatusReserva = async (req: Request, res: Response) => {
     const { reservaId } = req.params;
-    const { statusNovo } = req.body;
+    const { status } = req.body;
 
     try {
-        await reservaData.alterarStatusReserva(reservaId, statusNovo);
+        await reservaData.alterarStatusReserva(reservaId, status);
         res.status(200).json({ message: "Status atualizado com sucesso." });
     } catch (error) {
         res.status(500).json({

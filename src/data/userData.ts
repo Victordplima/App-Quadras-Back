@@ -82,3 +82,48 @@ export const listarUsuariosDB = async () => {
     return result.rows;
 };
 
+
+
+export const buscarHistoricoUsuarioDB = async (id: string) => {
+    const query = `
+        SELECT 
+            u.id AS usuario_id, u.nome, u.email, u.telefone, u.matricula, u.curso, u.role, u.bloqueado,
+            r.id AS reserva_id, r.quadra_id, r.data, r.hora_inicio, r.hora_fim, r.status, r.data_criacao, r.hora_criacao
+        FROM 
+            usuario u
+        LEFT JOIN 
+            reserva r ON u.id = r.usuario_id
+        WHERE 
+            u.id = $1;
+    `;
+    const result: QueryResult = await pool.query(query, [id]);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const user = {
+        id: result.rows[0].usuario_id,
+        nome: result.rows[0].nome,
+        email: result.rows[0].email,
+        telefone: result.rows[0].telefone,
+        matricula: result.rows[0].matricula,
+        curso: result.rows[0].curso,
+        role: result.rows[0].role,
+        bloqueado: result.rows[0].bloqueado,
+        reservas: result.rows
+            .filter(row => row.reserva_id !== null)
+            .map(row => ({
+                id: row.reserva_id,
+                quadra_id: row.quadra_id,
+                data: row.data,
+                hora_inicio: row.hora_inicio,
+                hora_fim: row.hora_fim,
+                status: row.status,
+                data_criacao: row.data_criacao,
+                hora_criacao: row.hora_criacao
+            }))
+    };
+
+    return user;
+};

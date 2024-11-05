@@ -31,9 +31,10 @@ export const criarReserva = async (reserva: any) => {
     return resultado.rows[0];
 };
 
-
-
-export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string) => {
+export const buscarReservasDaSemana = async (
+    page: number = 1,
+    quadraId?: string
+) => {
     const dataAtual = new Date();
 
     // Calcula o início da semana da página especificada
@@ -41,7 +42,9 @@ export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string
     const diasAdicionais = (page - 1) * 7; // deslocamento de semanas para a página solicitada
 
     // Define a data de início e fim da semana
-    const dataInicioSemana = new Date(dataAtual.setDate(diaAtual + diasAdicionais));
+    const dataInicioSemana = new Date(
+        dataAtual.setDate(diaAtual + diasAdicionais)
+    );
     dataInicioSemana.setHours(0, 0, 0, 0); // início da semana
 
     const dataFimSemana = new Date(dataInicioSemana);
@@ -64,9 +67,6 @@ export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string
     return resultado.rows;
 };
 
-
-
-
 export const buscarReservasPorUsuario = async (usuarioId: string) => {
     const resultado = await pool.query(
         `SELECT * FROM Reserva WHERE Usuario_ID = $1`,
@@ -75,14 +75,12 @@ export const buscarReservasPorUsuario = async (usuarioId: string) => {
     return resultado.rows;
 };
 
-
-
 export const alterarStatusReserva = async (
     reservaId: string,
-    statusNovo: string
+    status: string
 ) => {
     await pool.query(`UPDATE Reserva SET Status = $1 WHERE ID = $2`, [
-        statusNovo,
+        status,
         reservaId,
     ]);
 };
