@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import * as reservaData from "../data/reservaData";
+import pool from "../database/db";
+import { bloquearUsuario } from "../controllers/bloqueioController";
 
 export const criarReserva = async (req: Request, res: Response) => {
     const { usuarioId, quadraId, data, horaInicio, horaFim } = req.body;
@@ -65,4 +67,15 @@ export const alterarStatusReserva = async (req: Request, res: Response) => {
             error: "Erro ao atualizar o status da reserva.",
         });
     }
+};
+
+
+
+export const marcarAusenciaEbloquear = async (reservaId: number, usuarioId: number) => {
+    const motivo = "Ausência em reserva";
+    const descricao = "O usuário não compareceu à reserva e foi bloqueado por uma semana.";
+
+    await pool.query(`UPDATE reserva SET status = 'Não compareceu' WHERE id = $1`, [reservaId]);
+
+    await bloquearUsuario(usuarioId, motivo, descricao);
 };

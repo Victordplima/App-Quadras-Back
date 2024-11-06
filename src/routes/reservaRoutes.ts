@@ -6,12 +6,14 @@ import {
     verificarHorarioPermitido,
     verificarReservaConsecutiva,
 } from "../middleware/reservaMiddleware";
+import { verificarBloqueio } from "../middleware/verificarBloqueio";
 
 const router = Router();
 
 router.post(
     "/",
     protegerRota,
+    verificarBloqueio,
     verificarHorarioPermitido,
     verificarReservaConsecutiva,
     reservaController.criarReserva
