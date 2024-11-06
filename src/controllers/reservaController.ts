@@ -11,7 +11,7 @@ export const criarReserva = async (req: Request, res: Response) => {
             data,
             horaInicio,
             horaFim,
-            status: "Aguardando confirmação", // Status inicial
+            status: "Aguardando confirmação",
             dataCriacao: new Date(),
             horaCriacao: new Date().toLocaleTimeString(),
         };
@@ -19,6 +19,7 @@ export const criarReserva = async (req: Request, res: Response) => {
         const reservaCriada = await reservaData.criarReserva(novaReserva);
         res.status(201).json(reservaCriada);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: "Erro ao criar a reserva." });
     }
 };
