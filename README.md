@@ -8,3 +8,8 @@ DB_USER=
 DB_PASSWORD=
 DB_NAME=
 JWT_SECRET=
+```
+
+# Documentação
+
+https://documenter.getpostman.com/view/29442674/2sAXxJga5d
