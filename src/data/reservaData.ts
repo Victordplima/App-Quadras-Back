@@ -84,3 +84,13 @@ export const alterarStatusReserva = async (
         reservaId,
     ]);
 };
+
+
+
+export const buscarAgendamentosPorQuadraEDia = async (quadraId: string, data: string) => {
+    const resultado = await pool.query(
+        `SELECT * FROM reserva WHERE quadra_id = $1 AND data = $2`,
+        [quadraId, data]
+    );
+    return resultado.rows;
+};

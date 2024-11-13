@@ -79,3 +79,17 @@ export const marcarAusenciaEbloquear = async (reservaId: number, usuarioId: numb
 
     await bloquearUsuario(usuarioId, motivo, descricao);
 };
+
+
+
+export const buscarAgendamentosPorQuadraEDia = async (req: Request, res: Response) => {
+    const { quadraId } = req.params;
+    const { data } = req.query;
+
+    try {
+        const agendamentos = await reservaData.buscarAgendamentosPorQuadraEDia(quadraId, data as string);
+        res.status(200).json(agendamentos);
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar agendamentos." });
+    }
+};

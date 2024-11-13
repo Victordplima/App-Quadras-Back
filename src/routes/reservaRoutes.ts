@@ -8,6 +8,7 @@ import {
 } from "../middleware/reservaMiddleware";
 import { verificarBloqueio } from "../middleware/verificarBloqueio";
 
+
 const router = Router();
 
 router.post(
@@ -35,6 +36,12 @@ router.put(
     protegerRota,
     verificarPermissoes,
     reservaController.alterarStatusReserva
+);
+
+router.get(
+    "/:quadraId/agendamentos",
+    protegerRota,
+    reservaController.buscarAgendamentosPorQuadraEDia
 );
 
 export default router;
