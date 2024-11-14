@@ -42,3 +42,4 @@ export const buscarEsportesDaQuadra = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Erro ao buscar esportes da quadra." });
     }
 };
+

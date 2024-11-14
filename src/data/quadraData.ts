@@ -24,8 +24,13 @@ export const buscarTodasQuadras = async () => {
 
 export const buscarEsportesDaQuadra = async (quadraId: string) => {
     const resultado = await pool.query(
-        `SELECT Esporte FROM Quadra_Esportes WHERE Quadra_ID = $1`,
+        `SELECT q.nome AS quadra_nome, e.nome AS esporte
+         FROM quadra_esporte qe
+         JOIN quadra q ON q.id = qe.quadra_id
+         JOIN esporte e ON e.id = qe.esporte_id
+         WHERE qe.quadra_id = $1`,
         [quadraId]
     );
     return resultado.rows;
 };
+
