@@ -4,12 +4,13 @@ import pool from "../database/db";
 import { bloquearUsuario } from "../controllers/bloqueioController";
 
 export const criarReserva = async (req: Request, res: Response) => {
-    const { usuarioId, quadraId, data, horaInicio, horaFim } = req.body;
+    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } = req.body;
 
     try {
         const novaReserva = {
             usuarioId,
             quadraId,
+            esporteId,
             data,
             horaInicio,
             horaFim,
@@ -25,7 +26,6 @@ export const criarReserva = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Erro ao criar a reserva." });
     }
 };
-
 
 
 

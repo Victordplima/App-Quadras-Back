@@ -4,6 +4,7 @@ export const criarReserva = async (reserva: any) => {
     const {
         usuarioId,
         quadraId,
+        esporteId,
         data,
         horaInicio,
         horaFim,
@@ -13,12 +14,13 @@ export const criarReserva = async (reserva: any) => {
     } = reserva;
 
     const resultado = await pool.query(
-        `INSERT INTO Reserva (Usuario_ID, Quadra_ID, Data, Hora_inicio, Hora_fim, Status, Data_criacao, Hora_criacao)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO reserva (usuario_id, quadra_id, esporte_id, data, hora_inicio, hora_fim, status, data_criacao, hora_criacao)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
         [
             usuarioId,
             quadraId,
+            esporteId,
             data,
             horaInicio,
             horaFim,
@@ -31,35 +33,32 @@ export const criarReserva = async (reserva: any) => {
     return resultado.rows[0];
 };
 
-export const buscarReservasDaSemana = async (
-    page: number = 1,
-    quadraId?: string
-) => {
+
+export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string) => {
     const dataAtual = new Date();
+    const diaAtual = dataAtual.getDate() - dataAtual.getDay();
+    const diasAdicionais = (page - 1) * 7;
 
-    // Calcula o início da semana da página especificada
-    const diaAtual = dataAtual.getDate() - dataAtual.getDay(); // início da semana atual
-    const diasAdicionais = (page - 1) * 7; // deslocamento de semanas para a página solicitada
-
-    // Define a data de início e fim da semana
-    const dataInicioSemana = new Date(
-        dataAtual.setDate(diaAtual + diasAdicionais)
-    );
-    dataInicioSemana.setHours(0, 0, 0, 0); // início da semana
+    const dataInicioSemana = new Date(dataAtual.setDate(diaAtual + diasAdicionais));
+    dataInicioSemana.setHours(0, 0, 0, 0);
 
     const dataFimSemana = new Date(dataInicioSemana);
-    dataFimSemana.setDate(dataInicioSemana.getDate() + 6); // fim da semana
-    dataFimSemana.setHours(23, 59, 59, 999); // final do domingo
+    dataFimSemana.setDate(dataInicioSemana.getDate() + 6);
+    dataFimSemana.setHours(23, 59, 59, 999);
 
     const dataInicioISO = dataInicioSemana.toISOString().split("T")[0];
     const dataFimISO = dataFimSemana.toISOString().split("T")[0];
 
-    // se um quadraId for fornecido, incluir na query
-    let query = `SELECT * FROM Reserva WHERE Data BETWEEN $1 AND $2`;
+    let query = `
+        SELECT r.*, e.nome AS esporte_nome
+        FROM reserva r
+        JOIN esporte e ON r.esporte_id = e.id
+        WHERE r.data BETWEEN $1 AND $2
+    `;
     const params: any[] = [dataInicioISO, dataFimISO];
 
     if (quadraId) {
-        query += ` AND Quadra_ID = $3`;
+        query += ` AND r.quadra_id = $3`;
         params.push(quadraId);
     }
 
@@ -67,13 +66,18 @@ export const buscarReservasDaSemana = async (
     return resultado.rows;
 };
 
+
 export const buscarReservasPorUsuario = async (usuarioId: string) => {
     const resultado = await pool.query(
-        `SELECT * FROM Reserva WHERE Usuario_ID = $1`,
+        `SELECT r.*, e.nome AS esporte_nome
+         FROM reserva r
+         JOIN esporte e ON r.esporte_id = e.id
+         WHERE r.usuario_id = $1`,
         [usuarioId]
     );
     return resultado.rows;
 };
+
 
 export const alterarStatusReserva = async (
     reservaId: string,
