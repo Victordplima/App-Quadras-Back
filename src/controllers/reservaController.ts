@@ -44,14 +44,22 @@ export const buscarReservasDaSemana = async (req: Request, res: Response) => {
 
 export const buscarReservasPorUsuario = async (req: Request, res: Response) => {
     const { usuarioId } = req.params;
+    const { page, limit, quadra } = req.query;
 
     try {
-        const reservas = await reservaData.buscarReservasPorUsuario(usuarioId);
+        const reservas = await reservaData.buscarReservasPorUsuario(
+            usuarioId,
+            parseInt(page as string) || 1,
+            parseInt(limit as string) || 10,
+            quadra as string
+        );
         res.status(200).json(reservas);
     } catch (error) {
         res.status(500).json({ error: "Erro ao buscar reservas do usuário." });
     }
 };
+
+
 
 
 

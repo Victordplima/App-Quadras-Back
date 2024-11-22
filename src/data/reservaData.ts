@@ -67,16 +67,31 @@ export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string
 };
 
 
-export const buscarReservasPorUsuario = async (usuarioId: string) => {
-    const resultado = await pool.query(
-        `SELECT r.*, e.nome AS esporte_nome
-         FROM reserva r
-         JOIN esporte e ON r.esporte_id = e.id
-         WHERE r.usuario_id = $1`,
-        [usuarioId]
-    );
-    return resultado.rows;
+
+export const buscarReservasPorUsuario = async (usuarioId: string, page: number = 1, limit: number = 10, nomeQuadra?: string) => {
+    const offset = (page - 1) * limit;
+
+    let query = `
+        SELECT r.*, q.nome AS quadra_nome, e.nome AS esporte_nome
+        FROM reserva r
+        JOIN esporte e ON r.esporte_id = e.id
+        JOIN quadra q ON r.quadra_id = q.id
+        WHERE r.usuario_id = $1
+    `;
+    const params: any[] = [usuarioId, limit, offset];
+
+    if (nomeQuadra) { //busca pelo nome da quadra (sem case sensitive)
+        query += ` AND q.nome ILIKE $4`; 
+        params.push(`%${nomeQuadra}%`);
+    }
+
+    query += ` LIMIT $2 OFFSET $3`;
+
+    const result = await pool.query(query, params);
+    return result.rows;
 };
+
+
 
 
 export const alterarStatusReserva = async (
