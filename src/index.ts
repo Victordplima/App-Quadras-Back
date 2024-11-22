@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes'
 import reservaRoutes from './routes/reservaRoutes'
 import quadraRoutes from './routes/quadraRoutes'
+import './cronJobs/rejeitarReservasPassadas'
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
