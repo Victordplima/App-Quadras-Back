@@ -7,8 +7,7 @@ import pool from "../database/db";
 const JWT_SECRET = process.env.JWT_SECRET || "quadrasmaneiras123";
 
 export const criarReserva = async (req: Request, res: Response) => {
-    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } =
-        req.body;
+    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } = req.body;
 
     try {
         const novaReserva = {
@@ -25,9 +24,9 @@ export const criarReserva = async (req: Request, res: Response) => {
 
         const reservaCriada = await reservaData.criarReserva(novaReserva);
         res.status(201).json(reservaCriada);
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
-        res.status(500).json({ error: "Erro ao criar a reserva." });
+        res.status(error.status || 500).json({ error: error.message || "Erro ao criar a reserva." });
     }
 };
 
