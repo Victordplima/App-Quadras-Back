@@ -113,3 +113,22 @@ export const buscarAgendamentosPorQuadraEDia = async (quadraId: string, data: st
     );
     return resultado.rows;
 };
+
+
+
+export const obterReservaPorId = async (reservaId: string) => {
+    const resultado = await pool.query(
+        `SELECT * FROM reserva WHERE id = $1`,
+        [reservaId]
+    );
+    return resultado.rows[0];
+};
+
+
+
+export const atualizarStatusReserva = async (reservaId: string, status: string): Promise<void> => {
+    await pool.query(
+        `UPDATE reserva SET status = $1 WHERE id = $2`,
+        [status, reservaId]
+    );
+};
