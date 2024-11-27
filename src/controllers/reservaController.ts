@@ -7,7 +7,8 @@ import pool from "../database/db";
 const JWT_SECRET = process.env.JWT_SECRET || "quadrasmaneiras123";
 
 export const criarReserva = async (req: Request, res: Response) => {
-    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } = req.body;
+    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } =
+        req.body;
 
     try {
         const novaReserva = {
@@ -23,10 +24,18 @@ export const criarReserva = async (req: Request, res: Response) => {
         };
 
         const reservaCriada = await reservaData.criarReserva(novaReserva);
+
+        // Emite o evento para todos os clientes conectados
+        const io = req.app.get("io");
+        io.emit("atualizarReservas", {
+            mensagem: "Uma nova reserva foi criada!",
+            reserva: reservaCriada,
+        });
+
         res.status(201).json(reservaCriada);
-    } catch (error: any) {
+    } catch (error) {
         console.error(error);
-        res.status(error.status || 500).json({ error: error.message || "Erro ao criar a reserva." });
+        res.status(500).json({ error: "Erro ao criar a reserva." });
     }
 };
 
@@ -67,8 +76,20 @@ export const alterarStatusReserva = async (req: Request, res: Response) => {
 
     try {
         await reservaData.alterarStatusReserva(reservaId, status);
+
+        // Obtém a instância do `io` para emitir eventos
+        const io = req.app.get("io");
+
+        // Emite o evento de atualização de status para os clientes conectados
+        io.emit("atualizarReservas", {
+            mensagem: `O status da reserva ${reservaId} foi atualizado para ${status}.`,
+            reservaId,
+            status,
+        });
+
         res.status(200).json({ message: "Status atualizado com sucesso." });
     } catch (error) {
+        console.error("Erro ao atualizar o status da reserva:", error);
         res.status(500).json({
             error: "Erro ao atualizar o status da reserva.",
         });
