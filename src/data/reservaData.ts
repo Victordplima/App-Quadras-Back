@@ -132,3 +132,30 @@ export const atualizarStatusReserva = async (reservaId: string, status: string):
         [status, reservaId]
     );
 };
+
+
+
+export const buscarReservasPorData = async (data: Date) => {
+    const query = `
+        SELECT 
+            r.id AS reserva_id,
+            r.usuario_id,
+            r.quadra_id,
+            r.esporte_id,
+            r.data,
+            r.hora_inicio,
+            r.hora_fim,
+            r.status,
+            u.nome AS usuario_nome, -- Nome da pessoa que agendou
+            q.nome AS quadra_nome,
+            e.nome AS esporte_nome
+        FROM reserva r
+        JOIN usuario u ON r.usuario_id = u.id -- Relaciona a reserva com o usuário
+        JOIN quadra q ON r.quadra_id = q.id
+        JOIN esporte e ON r.esporte_id = e.id
+        WHERE r.data = $1
+        ORDER BY r.hora_inicio ASC
+    `;
+    const result = await pool.query(query, [data.toISOString().split("T")[0]]);
+    return result.rows;
+};

@@ -57,4 +57,10 @@ router.put(
     reservaController.cancelarReserva
 );
 
+router.get(
+    "/dia",
+    protegerRota,
+    reservaController.buscarReservasDoDia
+);
+
 export default router;

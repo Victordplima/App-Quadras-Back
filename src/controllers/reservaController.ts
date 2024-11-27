@@ -148,3 +148,13 @@ export const cancelarReserva = async (
         res.status(500).json({ error: "Erro ao cancelar a reserva." });
     }
 };
+
+export const buscarReservasDoDia = async (req: Request, res: Response) => {
+    try {
+        const reservas = await reservaData.buscarReservasPorData(new Date());
+        res.status(200).json(reservas);
+    } catch (error) {
+        console.error("Erro ao buscar reservas do dia:", error);
+        res.status(500).json({ mensagem: "Erro ao buscar reservas do dia." });
+    }
+};
