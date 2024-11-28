@@ -33,17 +33,13 @@ export const criarReserva = async (reserva: any) => {
     return resultado.rows[0];
 };
 
-export const buscarReservasDaSemana = async (
-    page: number = 1,
-    quadraId?: string
-) => {
+
+export const buscarReservasDaSemana = async (page: number = 1, quadraId?: string) => {
     const dataAtual = new Date();
     const diaAtual = dataAtual.getDate() - dataAtual.getDay();
     const diasAdicionais = (page - 1) * 7;
 
-    const dataInicioSemana = new Date(
-        dataAtual.setDate(diaAtual + diasAdicionais)
-    );
+    const dataInicioSemana = new Date(dataAtual.setDate(diaAtual + diasAdicionais));
     dataInicioSemana.setHours(0, 0, 0, 0);
 
     const dataFimSemana = new Date(dataInicioSemana);
@@ -57,7 +53,7 @@ export const buscarReservasDaSemana = async (
         SELECT r.*, e.nome AS esporte_nome, u.nome AS usuario_nome, u.curso, u.matricula
         FROM reserva r
         JOIN esporte e ON r.esporte_id = e.id
-        JOIN usuario u ON r.usuario_id = u.id  -- Adicionando o JOIN com a tabela de usuario
+        JOIN usuario u ON r.usuario_id = u.id
         WHERE r.data BETWEEN $1 AND $2
     `;
     const params: any[] = [dataInicioISO, dataFimISO];
@@ -67,21 +63,17 @@ export const buscarReservasDaSemana = async (
         params.push(quadraId);
     }
 
-    try {
-        const resultado = await pool.query(query, params);
-        return resultado.rows;
-    } catch (error) {
-        console.error("Erro ao buscar reservas da semana:", error);
-        throw new Error("Erro ao buscar reservas da semana.");
-    }
+    console.log("Query:", query);   // Verifique a query gerada
+    console.log("Params:", params); // Verifique os parâmetros enviados
+
+    const resultado = await pool.query(query, params);
+    return resultado.rows;
 };
 
-export const buscarReservasPorUsuario = async (
-    usuarioId: string,
-    page: number = 1,
-    limit: number = 10,
-    nomeQuadra?: string
-) => {
+
+
+
+export const buscarReservasPorUsuario = async (usuarioId: string, page: number = 1, limit: number = 10, nomeQuadra?: string) => {
     const offset = (page - 1) * limit;
 
     let query = `
@@ -93,9 +85,8 @@ export const buscarReservasPorUsuario = async (
     `;
     const params: any[] = [usuarioId, limit, offset];
 
-    if (nomeQuadra) {
-        //busca pelo nome da quadra (sem case sensitive)
-        query += ` AND q.nome ILIKE $4`;
+    if (nomeQuadra) { //busca pelo nome da quadra (sem case sensitive)
+        query += ` AND q.nome ILIKE $4`; 
         params.push(`%${nomeQuadra}%`);
     }
 
@@ -104,6 +95,9 @@ export const buscarReservasPorUsuario = async (
     const result = await pool.query(query, params);
     return result.rows;
 };
+
+
+
 
 export const alterarStatusReserva = async (
     reservaId: string,
@@ -115,10 +109,9 @@ export const alterarStatusReserva = async (
     ]);
 };
 
-export const buscarAgendamentosPorQuadraEDia = async (
-    quadraId: string,
-    data: string
-) => {
+
+
+export const buscarAgendamentosPorQuadraEDia = async (quadraId: string, data: string) => {
     const resultado = await pool.query(
         `SELECT * FROM reserva WHERE quadra_id = $1 AND data = $2`,
         [quadraId, data]
@@ -126,22 +119,26 @@ export const buscarAgendamentosPorQuadraEDia = async (
     return resultado.rows;
 };
 
+
+
 export const obterReservaPorId = async (reservaId: string) => {
-    const resultado = await pool.query(`SELECT * FROM reserva WHERE id = $1`, [
-        reservaId,
-    ]);
+    const resultado = await pool.query(
+        `SELECT * FROM reserva WHERE id = $1`,
+        [reservaId]
+    );
     return resultado.rows[0];
 };
 
-export const atualizarStatusReserva = async (
-    reservaId: string,
-    status: string
-): Promise<void> => {
-    await pool.query(`UPDATE reserva SET status = $1 WHERE id = $2`, [
-        status,
-        reservaId,
-    ]);
+
+
+export const atualizarStatusReserva = async (reservaId: string, status: string): Promise<void> => {
+    await pool.query(
+        `UPDATE reserva SET status = $1 WHERE id = $2`,
+        [status, reservaId]
+    );
 };
+
+
 
 export const buscarReservasPorData = async (data: Date) => {
     const query = `

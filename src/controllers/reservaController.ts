@@ -43,15 +43,18 @@ export const buscarReservasDaSemana = async (req: Request, res: Response) => {
     const { page = 1, quadraId } = req.query;
 
     try {
+        // Chama a função de busca de reservas, passando os parâmetros corretamente
         const reservas = await reservaData.buscarReservasDaSemana(
             Number(page),
-            quadraId as string
+            quadraId as string // Passando o quadraId como string
         );
-        res.status(200).json(reservas);
+        res.status(200).json(reservas); // Retorna as reservas encontradas
     } catch (error) {
+        // Se houver um erro, retorna status 500 e uma mensagem de erro
         res.status(500).json({ error: "Erro ao buscar reservas da semana." });
     }
 };
+
 
 export const buscarReservasPorUsuario = async (req: Request, res: Response) => {
     const { usuarioId } = req.params;
