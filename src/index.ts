@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import reservaRoutes from "./routes/reservaRoutes";
 import quadraRoutes from "./routes/quadraRoutes";
+import ocorrenciaRoutes from "./routes/ocorrenciaRoutes";
 import "./cronJobs/rejeitarReservasPassadas";
 
 const app: Application = express();
@@ -32,6 +33,7 @@ app.use("/auth", authRoutes);
 app.use("/usuarios", userRoutes);
 app.use("/reservas", reservaRoutes);
 app.use("/quadras", quadraRoutes);
+app.use("/ocorrencias", ocorrenciaRoutes);
 
 // Evento de conexão do WebSocket
 io.on("connection", (socket) => {
