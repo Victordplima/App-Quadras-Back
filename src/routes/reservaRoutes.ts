@@ -63,4 +63,10 @@ router.get(
     reservaController.buscarReservasDoDia
 );
 
+router.get(
+    "/dia-sem-ocorrencia",
+    protegerRota,
+    reservaController.buscarReservasDoDiaSemOcorrencias
+);
+
 export default router;

@@ -154,10 +154,10 @@ export const cancelarReserva = async (
             (dataReserva.getTime() - hoje.getTime()) / (1000 * 3600 * 24)
         );
 
-        // Se a reserva for cancelada com menos de 5 dias de antecedência
+        // bloqueia o usuario se a reserva for cancelada com menos de 5 dias de antecedência
         if (diasDeAntecedencia <= 5) {
             await bloqueioData.bloquearUsuario(
-                userId, // Usando o userId do token
+                userId,
                 "Cancelamento tardio",
                 "Cancelou a reserva com menos de 5 dias de antecedência."
             );
@@ -180,5 +180,18 @@ export const buscarReservasDoDia = async (req: Request, res: Response) => {
     } catch (error) {
         console.error("Erro ao buscar reservas do dia:", error);
         res.status(500).json({ mensagem: "Erro ao buscar reservas do dia." });
+    }
+};
+
+export const buscarReservasDoDiaSemOcorrencias = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const reservas = await reservaData.buscarReservasDoDiaSemOcorrenciasData(new Date());
+        res.status(200).json(reservas);
+    } catch (error) {
+        console.error("Erro ao buscar reservas sem ocorrências:", error);
+        res.status(500).json({ error: "Erro ao buscar reservas do dia atual sem ocorrências." });
     }
 };
