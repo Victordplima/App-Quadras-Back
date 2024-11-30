@@ -181,8 +181,9 @@ export const buscarReservasDoDiaSemOcorrenciasData = async (data: Date) => {
         INNER JOIN esporte e ON r.esporte_id = e.id
         INNER JOIN quadra q ON r.quadra_id = q.id
         WHERE 
-            DATE(r.data) = DATE($1)
-            AND NOT EXISTS (
+            DATE(r.data) = DATE($1) -- Data do dia especificado
+            AND r.status = 'Confirmada' -- Apenas reservas confirmadas
+            AND NOT EXISTS ( -- Excluir reservas que possuem ocorrências
                 SELECT 1 
                 FROM ocorrencias o
                 WHERE o.reserva_id = r.id
@@ -193,3 +194,4 @@ export const buscarReservasDoDiaSemOcorrenciasData = async (data: Date) => {
     const resultado = await pool.query(query, valores);
     return resultado.rows;
 };
+
