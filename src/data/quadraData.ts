@@ -14,7 +14,7 @@ export const buscarTodasQuadras = async () => {
         LEFT JOIN 
             esporte e ON qe.esporte_id = e.id
         ORDER BY 
-            q.id;
+            q.nome, e.nome; -- Ordena pelas quadras em ordem alfabética e pelos esportes dentro de cada quadra
     `);
 
     return resultado.rows;
@@ -34,6 +34,8 @@ export const buscarEsportesDaQuadra = async (quadraId: string) => {
             esporte e ON qe.esporte_id = e.id
         WHERE 
             qe.quadra_id = $1
+        ORDER BY 
+            e.nome; -- Ordena os esportes em ordem alfabética
         `,
         [quadraId]
     );
