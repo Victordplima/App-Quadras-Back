@@ -127,3 +127,31 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
 
     return user;
 };
+
+
+
+export const obterInformacoesUsuarioCompleto = async (id: string) => {
+    const query = `
+        SELECT 
+            u.id, 
+            u.nome, 
+            u.email, 
+            u.curso, 
+            u.matricula,
+            COUNT(DISTINCT r.id) AS total_agendamentos,
+            COUNT(DISTINCT b.id) AS total_bloqueios,
+            COUNT(DISTINCT o.id) FILTER (WHERE o.utilizacao = 'Não foi utilizada') AS total_faltas
+        FROM usuario u
+        LEFT JOIN reserva r ON u.id = r.usuario_id
+        LEFT JOIN bloqueio b ON u.id = b.usuario_id
+        LEFT JOIN ocorrencias o ON r.id = o.reserva_id
+        WHERE u.id = $1
+        GROUP BY u.id;
+    `;
+
+    const valores = [id];
+
+    const resultado = await pool.query(query, valores);
+
+    return resultado.rows[0] || null;
+};

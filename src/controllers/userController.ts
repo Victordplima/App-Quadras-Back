@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { encontrarUsuarioPorIdDB, editarUsuarioDB, deletarUsuarioDB, listarUsuariosDB,buscarHistoricoUsuarioDB } from '../data/userData';
+import { encontrarUsuarioPorIdDB, editarUsuarioDB, deletarUsuarioDB, listarUsuariosDB, buscarHistoricoUsuarioDB, obterInformacoesUsuarioCompleto } from '../data/userData';
 
 export const buscarUsuario = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -75,5 +75,25 @@ export const buscarHistoricoUsuario = async (req: Request, res: Response): Promi
     } catch (error) {
         console.error(error);
         res.status(500).json({ mensagem: 'Erro ao buscar histórico do usuário' });
+    }
+};
+
+
+
+export const buscarInformacoesUsuarioCompleto = async (req: Request, res: Response): Promise<void> => {
+    const { id } = req.params;
+
+    try {
+        const usuarioInformacoes = await obterInformacoesUsuarioCompleto(id);
+
+        if (!usuarioInformacoes) {
+            res.status(404).json({ mensagem: "Usuário não encontrado." });
+            return;
+        }
+
+        res.status(200).json(usuarioInformacoes);
+    } catch (error) {
+        console.error("Erro ao buscar informações completas do usuário:", error);
+        res.status(500).json({ mensagem: "Erro ao buscar informações completas do usuário." });
     }
 };
