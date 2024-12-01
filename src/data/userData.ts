@@ -136,6 +136,7 @@ export const obterInformacoesUsuarioCompleto = async (id: string) => {
             u.id, 
             u.nome, 
             u.email, 
+            u.telefone, -- Adicionando o número de telefone
             u.curso, 
             u.matricula,
             COUNT(DISTINCT r.id) AS total_agendamentos,
