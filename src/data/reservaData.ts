@@ -67,9 +67,6 @@ export const buscarReservasDaSemana = async (
         params.push(quadraId);
     }
 
-    console.log("Query:", query); // Verifique a query gerada
-    console.log("Params:", params); // Verifique os parâmetros enviados
-
     const resultado = await pool.query(query, params);
     return resultado.rows;
 };
@@ -167,8 +164,7 @@ export const buscarReservasPorData = async (data: Date) => {
 };
 
 export const buscarReservasDoDiaSemOcorrenciasData = async (data: Date) => {
-    const dataFormatada = data.toISOString().split("T")[0]; // Formata para 'YYYY-MM-DD'
-    console.log("Data formatada:", dataFormatada);
+    const dataFormatada = data.toISOString().split("T")[0];
 
     const query = `
         SELECT 
