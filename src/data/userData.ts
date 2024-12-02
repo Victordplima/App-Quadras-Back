@@ -112,9 +112,7 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
         LEFT JOIN 
             quadra q ON r.quadra_id = q.id
         LEFT JOIN 
-            quadra_esporte qe ON q.id = qe.quadra_id
-        LEFT JOIN 
-            esporte e ON qe.esporte_id = e.id
+            esporte e ON r.esporte_id = e.id
         WHERE 
             u.id = $1
         ORDER BY 
