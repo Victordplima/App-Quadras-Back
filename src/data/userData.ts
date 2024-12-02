@@ -87,14 +87,39 @@ export const listarUsuariosDB = async () => {
 export const buscarHistoricoUsuarioDB = async (id: string) => {
     const query = `
         SELECT 
-            u.id AS usuario_id, u.nome, u.email, u.telefone, u.matricula, u.curso, u.role, u.bloqueado,
-            r.id AS reserva_id, r.quadra_id, r.data, r.hora_inicio, r.hora_fim, r.status, r.data_criacao, r.hora_criacao
+            u.id AS usuario_id, 
+            u.nome, 
+            u.email, 
+            u.telefone, 
+            u.matricula, 
+            u.curso, 
+            u.role, 
+            u.bloqueado,
+            r.id AS reserva_id, 
+            r.quadra_id, 
+            q.nome AS quadra_nome,
+            e.nome AS esporte,
+            r.data, 
+            r.hora_inicio, 
+            r.hora_fim, 
+            r.status, 
+            r.data_criacao, 
+            r.hora_criacao
         FROM 
             usuario u
         LEFT JOIN 
             reserva r ON u.id = r.usuario_id
+        LEFT JOIN 
+            quadra q ON r.quadra_id = q.id
+        LEFT JOIN 
+            quadra_esporte qe ON q.id = qe.quadra_id
+        LEFT JOIN 
+            esporte e ON qe.esporte_id = e.id
         WHERE 
-            u.id = $1;
+            u.id = $1
+        ORDER BY 
+            r.data ASC, 
+            r.hora_inicio ASC;
     `;
     const result: QueryResult = await pool.query(query, [id]);
 
@@ -116,6 +141,8 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
             .map(row => ({
                 id: row.reserva_id,
                 quadra_id: row.quadra_id,
+                quadra_nome: row.quadra_nome,
+                esporte: row.esporte,
                 data: row.data,
                 hora_inicio: row.hora_inicio,
                 hora_fim: row.hora_fim,
