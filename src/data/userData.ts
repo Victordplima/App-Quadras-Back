@@ -1,5 +1,5 @@
-import pool from '../database/db';
-import { QueryResult } from 'pg';
+import pool from "../database/db";
+import { QueryResult } from "pg";
 
 export const criarUsuarioDB = async (
     nome: string,
@@ -20,15 +20,11 @@ export const criarUsuarioDB = async (
     return result.rows[0];
 };
 
-
-
 export const encontrarUsuarioPorEmailDB = async (email: string) => {
-    const query = 'SELECT * FROM usuario WHERE email = $1';
+    const query = "SELECT * FROM usuario WHERE email = $1";
     const result: QueryResult = await pool.query(query, [email]);
     return result.rows[0];
 };
-
-
 
 export const editarUsuarioDB = async (
     id: string,
@@ -54,10 +50,8 @@ export const editarUsuarioDB = async (
     return false;
 };
 
-
-
 export const deletarUsuarioDB = async (id: string) => {
-    const query = 'DELETE FROM usuario WHERE id = $1 RETURNING id';
+    const query = "DELETE FROM usuario WHERE id = $1 RETURNING id";
     const result: QueryResult = await pool.query(query, [id]);
 
     if (result?.rowCount && result.rowCount > 0) {
@@ -66,25 +60,25 @@ export const deletarUsuarioDB = async (id: string) => {
     return false;
 };
 
-
-
 export const encontrarUsuarioPorIdDB = async (id: string) => {
-    const query = 'SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario WHERE id = $1';
+    const query =
+        "SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario WHERE id = $1";
     const result: QueryResult = await pool.query(query, [id]);
     return result.rows[0];
 };
 
-
-
 export const listarUsuariosDB = async () => {
-    const query = 'SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario';
+    const query =
+        "SELECT id, nome, email, telefone, matricula, curso, role, bloqueado FROM usuario";
     const result: QueryResult = await pool.query(query);
     return result.rows;
 };
 
-
-
-export const buscarHistoricoUsuarioDB = async (id: string) => {
+export const buscarHistoricoUsuarioDB = async (
+    id: string,
+    limit: number,
+    offset: number
+) => {
     const query = `
         SELECT 
             u.id AS usuario_id, 
@@ -117,9 +111,10 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
             u.id = $1
         ORDER BY 
             r.data ASC, 
-            r.hora_inicio ASC;
+            r.hora_inicio ASC
+        LIMIT $2 OFFSET $3;
     `;
-    const result: QueryResult = await pool.query(query, [id]);
+    const result: QueryResult = await pool.query(query, [id, limit, offset]);
 
     if (result.rows.length === 0) {
         return null;
@@ -135,8 +130,8 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
         role: result.rows[0].role,
         bloqueado: result.rows[0].bloqueado,
         reservas: result.rows
-            .filter(row => row.reserva_id !== null)
-            .map(row => ({
+            .filter((row) => row.reserva_id !== null)
+            .map((row) => ({
                 id: row.reserva_id,
                 quadra_id: row.quadra_id,
                 quadra_nome: row.quadra_nome,
@@ -146,14 +141,12 @@ export const buscarHistoricoUsuarioDB = async (id: string) => {
                 hora_fim: row.hora_fim,
                 status: row.status,
                 data_criacao: row.data_criacao,
-                hora_criacao: row.hora_criacao
-            }))
+                hora_criacao: row.hora_criacao,
+            })),
     };
 
     return user;
 };
-
-
 
 export const obterInformacoesUsuarioCompleto = async (id: string) => {
     const query = `

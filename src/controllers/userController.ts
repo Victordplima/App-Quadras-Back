@@ -64,7 +64,14 @@ export const listarTodosUsuarios = async (_req: Request, res: Response) => {
 export const buscarHistoricoUsuario = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const usuarioComHistorico = await buscarHistoricoUsuarioDB(id);
+        const { page = 1, limit = 20 } = req.query;
+
+        const pageNumber = parseInt(page as string, 10);
+        const pageLimit = parseInt(limit as string, 10);
+
+        const offset = (pageNumber - 1) * pageLimit;
+
+        const usuarioComHistorico = await buscarHistoricoUsuarioDB(id, pageLimit, offset);
 
         if (!usuarioComHistorico) {
             res.status(404).json({ mensagem: 'Usuário não encontrado' });
