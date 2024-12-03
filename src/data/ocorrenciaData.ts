@@ -53,3 +53,40 @@ export const listarOcorrencias = async ({
         throw error;
     }
 };
+
+
+
+export const editarOcorrenciaDB = async (id: string, utilizacao: string, relato: string) => {
+    const query = `
+        UPDATE ocorrencias
+        SET utilizacao = $1, relato = $2
+        WHERE id = $3
+        RETURNING *;
+    `;
+    
+    const result = await pool.query(query, [utilizacao, relato, id]);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    return result.rows[0];
+};
+
+
+
+export const deletarOcorrenciaDB = async (id: string) => {
+    const query = `
+        DELETE FROM ocorrencias
+        WHERE id = $1
+        RETURNING *;
+    `;
+    
+    const result = await pool.query(query, [id]);
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    return result.rows[0];
+};
