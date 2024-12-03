@@ -1,13 +1,21 @@
-// import { Router } from "express";
-// import * as bloqueioController from "../controllers/bloqueioController";
-// import { protegerRota } from "../middleware/authMiddleware";
+import { Router } from "express";
+import {
+    criarBloqueio,
+    buscarBloqueios,
+    editarBloqueio,
+    deletarBloqueio,
+    buscarBloqueiosPorUsuario,
+} from "../controllers/bloqueioController";
 
-// const router = Router();
+import { protegerRota } from "../middleware/authMiddleware";
+import { verificarPermissoes } from "../middleware/verificarPermissoes";
 
-// router.put(
-//     "/reservas/:reservaId/cancelar",
-//     protegerRota,
-//     bloqueioController.cancelarReserva
-// );
+const router = Router();
 
-// export default router;
+router.post("/", protegerRota, verificarPermissoes, criarBloqueio);
+router.get("/", protegerRota, buscarBloqueios);
+router.get("/:usuarioId", buscarBloqueiosPorUsuario);
+router.put("/:id", protegerRota, verificarPermissoes, editarBloqueio);
+router.delete("/:id", protegerRota, verificarPermissoes, deletarBloqueio);
+
+export default router;
