@@ -14,7 +14,7 @@ const router = Router();
 
 router.post("/", protegerRota, verificarPermissoes, criarBloqueio);
 router.get("/", protegerRota, buscarBloqueios);
-router.get("/:usuarioId", buscarBloqueiosPorUsuario);
+router.get("/:usuarioId", protegerRota, buscarBloqueiosPorUsuario);
 router.put("/:id", protegerRota, verificarPermissoes, editarBloqueio);
 router.delete("/:id", protegerRota, verificarPermissoes, deletarBloqueio);
 
