@@ -154,7 +154,7 @@ export const cancelarReserva = async (
             (dataReserva.getTime() - hoje.getTime()) / (1000 * 3600 * 24)
         );
 
-        // bloqueia o usuario se a reserva for cancelada com menos de 5 dias de antecedência
+        // Bloqueia o usuário se a reserva for cancelada com menos de 5 dias de antecedência
         if (diasDeAntecedencia <= 5) {
             await bloqueioData.bloquearUsuario(
                 userId,
@@ -165,6 +165,16 @@ export const cancelarReserva = async (
 
         // Atualiza o status da reserva para "Cancelada"
         await reservaData.atualizarStatusReserva(reservaId, "Cancelada");
+
+        // Obtém a instância do Socket.IO
+        const io = req.app.get("io");
+
+        // Emite o evento de atualização para todos os clientes conectados
+        io.emit("atualizarReservas", {
+            mensagem: `A reserva ${reservaId} foi cancelada.`,
+            reservaId,
+            status: "Cancelada",
+        });
 
         res.json({ message: "Reserva cancelada com sucesso." });
     } catch (error) {
