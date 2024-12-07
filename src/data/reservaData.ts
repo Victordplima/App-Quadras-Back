@@ -67,6 +67,8 @@ export const buscarReservasDaSemana = async (
         params.push(quadraId);
     }
 
+    query += ` ORDER BY r.data ASC`;
+
     const resultado = await pool.query(query, params);
     return resultado.rows;
 };
