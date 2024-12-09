@@ -1,12 +1,10 @@
 import { RequestHandler } from "express";
 import pool from "../database/db";
 
-// Middleware para verificar horários permitidos
-export const verificarHorarioPermitido: RequestHandler = (req, res, next) => {
-    const { horaInicio, horaFim, data } = req.body;
+export const verificarHorarioPermitido: RequestHandler = async (req, res, next) => {
+    const { horaInicio, horaFim, data, quadraId } = req.body;
 
     try {
-        // Validação do horário
         const inicio = parseInt(horaInicio.split(":")[0], 10);
         const fim = parseInt(horaFim.split(":")[0], 10);
 
@@ -14,22 +12,42 @@ export const verificarHorarioPermitido: RequestHandler = (req, res, next) => {
             res.status(400).json({
                 mensagem: "A reserva deve ser entre 13:00 e 21:00.",
             });
-            return; // Encerra a função aqui
+            return;
         }
 
-        // Validação se a data e hora já passaram
         const dataAtual = new Date();
-        const dataReserva = new Date(`${data}T${horaInicio}`);
+        const dataReservaInicio = new Date(`${data}T${horaInicio}`);
+        const dataReservaFim = new Date(`${data}T${horaFim}`);
 
-        if (dataReserva < dataAtual) {
+        if (dataReservaInicio < dataAtual) {
             res.status(400).json({
-                mensagem:
-                    "Não é possível criar uma reserva para uma data ou horário que já passou.",
+                mensagem: "Não é possível criar uma reserva para uma data ou horário que já passou.",
             });
-            return; // Encerra a função aqui
+            return;
         }
 
-        next(); // Continua o fluxo se estiver tudo válido
+        const query = `
+            SELECT 1 
+            FROM reserva 
+            WHERE quadra_id = $1
+            AND data = $2
+            AND (
+                (hora_inicio < $4 AND hora_fim > $3) OR
+                (hora_inicio >= $3 AND hora_inicio < $4)
+            )
+        `;
+        const params = [quadraId, data, horaInicio, horaFim];
+
+        const resultado = await pool.query(query, params);
+
+        if (resultado?.rowCount && resultado.rowCount > 0) {
+            res.status(400).json({
+                mensagem: "Já existe uma reserva para esta quadra no horário especificado.",
+            });
+            return;
+        }
+
+        next();
     } catch (error) {
         console.error("Erro ao validar horário da reserva:", error);
         res.status(500).json({
@@ -38,7 +56,8 @@ export const verificarHorarioPermitido: RequestHandler = (req, res, next) => {
     }
 };
 
-// Middleware para verificar reservas consecutivas
+
+
 export const verificarReservaConsecutiva: RequestHandler = async (
     req,
     res,
@@ -62,10 +81,10 @@ export const verificarReservaConsecutiva: RequestHandler = async (
             res.status(400).json({
                 mensagem: "Não é permitido fazer duas reservas seguidas.",
             });
-            return; // Encerra a função aqui
+            return;
         }
 
-        next(); // Continua o fluxo se não houver reservas consecutivas
+        next();
     } catch (error) {
         console.error("Erro ao verificar reserva consecutiva:", error);
         res.status(500).json({
