@@ -33,6 +33,43 @@ export const criarReserva = async (reserva: any) => {
     return resultado.rows[0];
 };
 
+
+
+export const criarReservaAdmin = async (reserva: any) => {
+    const {
+        usuarioId,
+        quadraId,
+        esporteId,
+        data,
+        horaInicio,
+        horaFim,
+        status,
+        dataCriacao,
+        horaCriacao,
+    } = reserva;
+
+    const resultado = await pool.query(
+        `INSERT INTO reserva (usuario_id, quadra_id, esporte_id, data, hora_inicio, hora_fim, status, data_criacao, hora_criacao)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING *`,
+        [
+            usuarioId,
+            quadraId,
+            esporteId,
+            data,
+            horaInicio,
+            horaFim,
+            status,
+            dataCriacao,
+            horaCriacao,
+        ]
+    );
+
+    return resultado.rows[0];
+};
+
+
+
 export const buscarReservasDaSemana = async (
     page: number = 1,
     quadraId?: string

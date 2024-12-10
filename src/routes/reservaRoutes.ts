@@ -7,6 +7,7 @@ import {
     verificarReservaConsecutiva,
 } from "../middleware/reservaMiddleware";
 import { verificarBloqueio } from "../middleware/verificarBloqueio";
+import { verificarAdmin } from "../middleware/verificarAdmin";
 
 const router = Router();
 
@@ -18,6 +19,14 @@ router.post(
     verificarHorarioPermitido,
     verificarReservaConsecutiva,
     reservaController.criarReserva
+);
+
+// Criar uma nova reserva como aula (somente admins)
+router.post(
+    "/admin",
+    protegerRota,
+    verificarAdmin,
+    reservaController.criarReservaAdmin
 );
 
 // Buscar reservas da semana

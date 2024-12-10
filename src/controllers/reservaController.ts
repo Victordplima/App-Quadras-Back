@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import * as reservaData from "../data/reservaData";
 import * as bloqueioData from "../data/bloqueioData";
 import jwt from "jsonwebtoken";
-import pool from "../database/db";
 
 const JWT_SECRET = process.env.JWT_SECRET || "quadrasmaneiras123";
 
@@ -38,6 +37,43 @@ export const criarReserva = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Erro ao criar a reserva." });
     }
 };
+
+
+
+export const criarReservaAdmin = async (req: Request, res: Response) => {
+    const { usuarioId, quadraId, esporteId, data, horaInicio, horaFim } =
+        req.body;
+
+    try {
+        const novaReserva = {
+            usuarioId,
+            quadraId,
+            esporteId,
+            data,
+            horaInicio,
+            horaFim,
+            status: "Aula",
+            dataCriacao: new Date(),
+            horaCriacao: new Date().toLocaleTimeString(),
+        };
+
+        const reservaCriada = await reservaData.criarReservaAdmin(novaReserva);
+
+        // Emite o evento para todos os clientes conectados
+        const io = req.app.get("io");
+        io.emit("atualizarReservas", {
+            mensagem: "Uma nova reserva foi criada!",
+            reserva: reservaCriada,
+        });
+
+        res.status(201).json(reservaCriada);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Erro ao criar a reserva." });
+    }
+};
+
+
 
 export const buscarReservasDaSemana = async (req: Request, res: Response) => {
     const { page = 1, quadraId } = req.query;
