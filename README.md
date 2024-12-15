@@ -10,7 +10,9 @@
 
 <h2 id="sobre">✨ Sobre</h2>
 
-Este projeto é uma aplicação web que permite usuários realizarem reservas para o uso das quadras. Os admins tem total controle das reservas e dos perfis.
+Essa API foi feita em Node e permite usuários realizem reservas para o uso das quadras. Os admins tem total controle das reservas e dos perfis.
+
+O projeto utiliza Socket.io e Cronjob.
 
 O projeto tem 3 roles diferentes, cada um com sua função e telas.
 
